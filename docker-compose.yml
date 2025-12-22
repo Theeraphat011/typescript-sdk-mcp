@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # MCP Server (Production mode - comment out if using dev server)
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: mcp-server
+    ports:
+      - "4000:4000"
+    environment:
+      - MCP_PORT=4000
+      - NODE_ENV=production
+    networks:
+      - flowise-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/mcp", "||", "exit", "1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # Uncomment to disable in dev mode
+    # profiles:
+    #   - production
+
+    # Flowise
+  flowise:
+    image: flowiseai/flowise:latest
+    container_name: flowise
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - FLOWISE_USERNAME=${FLOWISE_USERNAME:-admin}
+      - FLOWISE_PASSWORD=${FLOWISE_PASSWORD:-admin123}
+      - DATABASE_PATH=/root/.flowise
+      - APIKEY_PATH=/root/.flowise
+      - SECRETKEY_PATH=/root/.flowise
+      - LOG_LEVEL=info
+      - DEBUG=false
+      # MCP Server URL
+      # For production (with mcp-server container): http://mcp-server:4000/mcp
+      # For development (host machine): http://host.docker.internal:4000/mcp
+      - MCP_SERVER_URL=${MCP_SERVER_URL:-http://mcp-server:4000/mcp}
+    volumes:
+      - flowise-data:/root/.flowise
+    networks:
+      - flowise-network
+    # Uncomment depends_on in production mode
+    depends_on:
+      mcp-server:
+        condition: service_healthy
+    restart: unless-stopped
+    extra_hosts:
+      # Allow Flowise to access host machine (for dev server)
+      - "host.docker.internal:host-gateway"
+
+networks:
+  flowise-network:
+    driver: bridge
+
+volumes:
+  flowise-data:
+    driver: local

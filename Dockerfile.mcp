@@ -1,0 +1,33 @@
+# Use Node.js LTS version
+FROM node:20-alpine
+
+# Install pnpm
+RUN npm install -g pnpm@10.24.0
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json pnpm-workspace.yaml ./
+COPY examples/server/package.json ./examples/server/
+COPY src/package.json ./src/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build the project
+WORKDIR /app/examples/server
+RUN pnpm build || echo "Build step skipped"
+
+# Expose MCP server port
+EXPOSE 4000
+
+# Set environment variables
+ENV MCP_PORT=4000
+ENV NODE_ENV=production
+
+# Start the MCP server
+CMD ["pnpm", "exec", "tsx", "src/simpleStreamableHttp.ts"]

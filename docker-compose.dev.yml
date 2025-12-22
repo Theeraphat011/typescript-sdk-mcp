@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # Flowise only (for development with host MCP server)
+  flowise:
+    image: flowiseai/flowise:latest
+    container_name: flowise-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - FLOWISE_USERNAME=${FLOWISE_USERNAME:-admin}
+      - FLOWISE_PASSWORD=${FLOWISE_PASSWORD:-admin123}
+      - DATABASE_PATH=/root/.flowise
+      - APIKEY_PATH=/root/.flowise
+      - SECRETKEY_PATH=/root/.flowise
+      - LOG_LEVEL=debug
+      - DEBUG=true
+    volumes:
+      - flowise-dev-data:/root/.flowise
+    restart: unless-stopped
+    extra_hosts:
+      # Allow Flowise to access host machine
+      - "host.docker.internal:host-gateway"
+    network_mode: bridge
+
+volumes:
+  flowise-dev-data:
+    driver: local
