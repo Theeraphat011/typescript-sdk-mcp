@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import 'dotenv/config';
 
 import { setupAuthServer } from '@modelcontextprotocol/examples-shared';
 import type {
@@ -193,7 +194,7 @@ const app = createMcpExpressApp({
 // Set up OAuth if enabled
 let authMiddleware = null;
 if (useOAuth) {
-    
+
     // Create auth middleware for MCP endpoints
     const mcpServerUrl = new URL(`http://localhost:${MCP_PORT}/mcp`);
     const authServerUrl = new URL(`http://localhost:${AUTH_PORT}`);

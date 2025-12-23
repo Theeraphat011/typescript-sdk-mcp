@@ -39,6 +39,7 @@
         "@modelcontextprotocol/examples-shared": "workspace:^",
         "@modelcontextprotocol/server": "workspace:^",
         "cors": "catalog:runtimeServerOnly",
+        "dotenv": "^17.2.3",
         "express": "catalog:runtimeServerOnly",
         "googleapis": "^169.0.0",
         "hono": "catalog:runtimeServerOnly",
