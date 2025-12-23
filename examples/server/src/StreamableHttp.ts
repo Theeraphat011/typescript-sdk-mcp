@@ -3,16 +3,11 @@ import { randomUUID } from 'node:crypto';
 import { setupAuthServer } from '@modelcontextprotocol/examples-shared';
 import type {
     CallToolResult,
-    GetPromptResult,
     OAuthMetadata,
-    PrimitiveSchemaDefinition,
-    ReadResourceResult,
-    ResourceLink
 } from '@modelcontextprotocol/server';
 import {
     checkResourceAllowed,
     createMcpExpressApp,
-    ElicitResultSchema,
     getOAuthProtectedResourceMetadataUrl,
     InMemoryTaskMessageQueue,
     InMemoryTaskStore,
@@ -183,74 +178,6 @@ const getServer = () => {
     );
 
 
-    // Register a simple tool that returns a greeting
-    server.registerTool(
-        'greet',
-        {
-            title: 'Greeting Tool', // Display name for UI
-            description: 'A simple greeting tool',
-            inputSchema: {
-                name: z.string().describe('Name to greet')
-            }
-        },
-        async ({ name }): Promise<CallToolResult> => {
-            return {
-                content: [
-                    {
-                        type: 'text',
-                        text: `Hello, ${name}!`
-                    }
-                ]
-            };
-        }
-    );
-
-
-    // Using the experimental tasks API - WARNING: may change without notice
-    server.experimental.tasks.registerToolTask(
-        'delay',
-        {
-            title: 'Delay',
-            description: 'A simple tool that delays for a specified duration, useful for testing task execution',
-            inputSchema: {
-                duration: z.number().describe('Duration in milliseconds').default(5000)
-            }
-        },
-        {
-            async createTask({ duration }, { taskStore, taskRequestedTtl }) {
-                // Create the task
-                const task = await taskStore.createTask({
-                    ttl: taskRequestedTtl
-                });
-
-                // Simulate out-of-band work
-                (async () => {
-                    await new Promise(resolve => setTimeout(resolve, duration));
-                    await taskStore.storeTaskResult(task.taskId, 'completed', {
-                        content: [
-                            {
-                                type: 'text',
-                                text: `Completed ${duration}ms delay`
-                            }
-                        ]
-                    });
-                })();
-
-                // Return CreateTaskResult with the created task
-                return {
-                    task
-                };
-            },
-            async getTask(_args, { taskId, taskStore }) {
-                return await taskStore.getTask(taskId);
-            },
-            async getTaskResult(_args, { taskId, taskStore }) {
-                const result = await taskStore.getTaskResult(taskId);
-                return result as CallToolResult;
-            }
-        }
-    );
-
     return server;
 };
 
@@ -266,6 +193,7 @@ const app = createMcpExpressApp({
 // Set up OAuth if enabled
 let authMiddleware = null;
 if (useOAuth) {
+    
     // Create auth middleware for MCP endpoints
     const mcpServerUrl = new URL(`http://localhost:${MCP_PORT}/mcp`);
     const authServerUrl = new URL(`http://localhost:${AUTH_PORT}`);
