@@ -1,10 +1,5 @@
 import type { EventStore, JSONRPCMessage } from '@modelcontextprotocol/server';
 
-/**
- * Simple in-memory implementation of the EventStore interface for resumability
- * This is primarily intended for examples and testing, not for production use
- * where a persistent storage solution would be more appropriate.
- */
 export class InMemoryEventStore implements EventStore {
     private events: Map<string, { streamId: string; message: JSONRPCMessage }> = new Map();
 

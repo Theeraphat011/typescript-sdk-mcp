@@ -22,6 +22,7 @@
         "mcp"
     ],
     "scripts": {
+        "dev": "tsx src/StreamableHttp.ts",
         "typecheck": "tsgo -p tsconfig.json --noEmit",
         "build": "tsdown",
         "build:watch": "tsdown --watch",
@@ -35,11 +36,12 @@
     },
     "dependencies": {
         "@hono/node-server": "catalog:runtimeServerOnly",
-        "hono": "catalog:runtimeServerOnly",
         "@modelcontextprotocol/examples-shared": "workspace:^",
         "@modelcontextprotocol/server": "workspace:^",
         "cors": "catalog:runtimeServerOnly",
         "express": "catalog:runtimeServerOnly",
+        "googleapis": "^169.0.0",
+        "hono": "catalog:runtimeServerOnly",
         "zod": "catalog:runtimeShared"
     },
     "devDependencies": {

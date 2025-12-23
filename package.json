@@ -21,8 +21,10 @@
         "mcp"
     ],
     "scripts": {
+        "dev": "pnpm --filter @modelcontextprotocol/examples-server exec tsx src/StreamableHttp.ts",
+        "inspector": "npx @modelcontextprotocol/inspector node path/to/server/index.js args...",
         "fetch:spec-types": "tsx scripts/fetch-spec-types.ts",
-        "examples:simple-server:w": "pnpm --filter @modelcontextprotocol/examples-server exec tsx --watch src/simpleStreamableHttp.ts --oauth",
+        "examples:simple-server:w": "pnpm --filter @modelcontextprotocol/examples-server exec tsx --watch src/StreamableHttp.ts --oauth",
         "typecheck:all": "pnpm -r typecheck",
         "build:all": "pnpm -r build",
         "prepack:all": "pnpm -r prepack",
